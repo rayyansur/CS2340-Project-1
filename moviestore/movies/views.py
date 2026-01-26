@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Review
+from .models import Movie, Review, Report
 from django.contrib.auth.decorators import login_required
 
 def index(request):
@@ -60,3 +60,13 @@ def delete_review(request, id, review_id):
         user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+@login_required
+def report_review(request, id, review_id):
+    if request.method == 'POST':
+        report = Report()
+        report.review = Review.objects.get(id=review_id)
+        report.text = request.POST['report_text']
+        report.report_user = request.user
+        report.save()
+        return redirect('movies.show', id=id)
